@@ -1,0 +1,154 @@
+@page "/UserList"
+@using StudentIncubator.Data.ServiceInterface
+@using StudentIncubator.Models
+@using Blazorise.Extensions
+
+
+@inject IUserService UserService
+@inject IFavoriteService FavoriteService
+@inject NavigationManager NavigationManager
+
+<style>body{background-color:#1F2833}</style>
+
+<h3>All users</h3>
+
+<p class="errorMessage">@errorMessage</p>
+<div>
+    <p>Search by username: <input type="text" @oninput="SearchUser"></p>
+</div>
+
+<Switch TValue="bool" @bind-Value="@FavoritesOnly" CheckedChanged="@OnlyFavorites">Favorites only</Switch>
+
+
+@if (Displayed is {Count: > 0 })
+{
+    <p class="infoMessage">@infoMessage </p>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Username</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in Displayed)
+        {
+            @if (!user.Username.Equals(UserService.CachedUser.Username)) {
+                <tr>
+                    <td>@user.Username</td>
+                    <td>
+                        <Button Color="Color.Primary" @onclick="() => OpenUserDetails(user.Username)">
+                            Details
+                        </Button>
+                    </td>
+                    @if (FavoriteNames != null) {
+                        <td>
+                            <Button Color="Color.Primary" @onclick="() => ToggleFavoriteAsync(user.Username)">
+                                @ButtonText(user.Username)
+                            </Button>
+                        </td>
+                    }
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+}
+else if (SearchByUsername != null)
+{
+    <p class="infoMessage">No users to display.</p>
+}
+else
+{
+    <p class="infoMessage">Loading...</p>
+}
+
+@code {
+    private IList<User> AllUsers { get; set; }
+    private IList<User> Displayed { get; set; }
+    private IList<string> FavoriteNames { get; set; }
+    private IList<User> Favorites { get; set; }
+    private string SearchByUsername { get; set; }
+    private string errorMessage = "";
+    private string infoMessage = "";
+    private bool FavoritesOnly { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try {
+            FavoriteNames = await FavoriteService.GetFavoritesAsync(UserService.CachedUser.Username);
+            AllUsers = await UserService.GetAllUsersAsync();
+            Displayed = AllUsers;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.StackTrace);
+            errorMessage = e.Message;
+        }
+    }
+
+    private void OpenUserDetails(string username)
+    {
+        errorMessage = "";
+        NavigationManager.NavigateTo($"/Users/{username}");
+    }
+
+    private void SearchUser(ChangeEventArgs evt)
+    {
+        try
+        {
+            if (evt.Value != null) SearchByUsername = evt.Value.ToString();
+            ExecuteFilter(SearchByUsername);
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+    }
+
+    private void ExecuteFilter(string username)
+    {
+        errorMessage = "";
+        if (!FavoritesOnly) {
+            Displayed = username.IsNullOrEmpty() ? AllUsers : AllUsers.Where(u => u.Username.ToLower().Contains(username.ToLower())).ToList();
+        }
+        else {
+            Displayed = username.IsNullOrEmpty() ? Favorites : Favorites.Where(u => u.Username.ToLower().Contains(username.ToLower())).ToList();
+        }
+    }
+
+    private async Task ToggleFavoriteAsync(string target)
+    {
+        if (ButtonText(target).Contains("Add"))
+        {
+            infoMessage = await FavoriteService.AddFavoriteAsync(UserService.CachedUser.Username, target);
+        }
+        else
+        {
+            infoMessage = await FavoriteService.RemoveFavoriteAsync(UserService.CachedUser.Username, target);
+        }
+
+        await OnInitializedAsync();
+    }
+
+    private void OnlyFavorites(bool value) {
+        FavoritesOnly = value;
+        if (FavoritesOnly) {
+            IList<User> favorites = new List<User>();
+            foreach (var u in AllUsers) {
+                if (FavoriteNames.Any(f => f.Equals(u.Username))) {
+                   favorites.Add(u);
+                }
+            }
+            Displayed = favorites;
+            Favorites = Displayed;
+        }
+        else {
+            Displayed = AllUsers;
+        }
+    }
+
+    private string ButtonText(string otherUsername)
+    {
+        return FavoriteNames.Contains(otherUsername) ? "Remove favorite" : "Add favorite";
+    }
+}

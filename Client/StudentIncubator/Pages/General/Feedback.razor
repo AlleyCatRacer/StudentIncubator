@@ -1,0 +1,106 @@
+@page "/Feedback"
+@using StudentIncubator.Authorization
+@using StudentIncubator.Data.ServiceInterface
+@using Blazorise.Extensions
+@using Action = StudentIncubator.Models.Action
+@inject AuthenticationStateProvider AuthStat
+@inject ISuggestionService suggestionService
+@inject IActionService actionService
+
+<style>body{background-color:#1F2833}</style>
+
+<h3>Place for your ideas to be sent to the developers</h3>
+
+
+<div class="form-group ">
+    <label class="control-label">Input your marvelous suggestion:</label><br/>
+    <p class="infoMessage">@SuggestionErrorMessage</p>
+    <input placeholder="Your suggestion" @bind="Suggestion" size="150"/>
+</div>
+
+<p class="actions">
+    <Button Color="Color.Primary" @onclick="SendSuggestion">Send</Button>
+</p>
+
+<br/>
+<br/>
+
+<h3>Place for your action suggestions to be sent to the developers</h3>
+
+<EditForm Model="@newAction" OnValidSubmit="@SendAction">
+    <DataAnnotationsValidator/>
+    <div style=" color:white" class="form-group">
+        Activity name:<br/>
+        <ValidationMessage For="@(() => newAction.Activity)"/>
+        <InputTextArea  rows="1" @bind-Value="newAction.Activity"/>
+    </div>
+    <div style=" color:white" class="form-group">
+        Academic effect:<br/>
+        <ValidationMessage For="@(() => newAction.Academic)"/>
+        <InputNumber rows="1" @bind-Value="newAction.Academic"/>
+    </div>
+    <div style=" color:white" class="form-group">
+        Financial effect:<br/>
+        <ValidationMessage For="@(() => newAction.Financial)"/>
+        <InputNumber rows="1" @bind-Value="newAction.Financial"/>
+    </div>
+    <div style=" color:white" class="form-group">
+        Health effect:<br/>
+        <ValidationMessage For="@(() => newAction.Health)"/>
+        <InputNumber rows="1" @bind-Value="newAction.Health"/>
+    </div>
+    <div style=" color:white" class="form-group">
+        Social effect:<br/>
+        <ValidationMessage For="@(() => newAction.Social)"/>
+        <InputNumber rows="1" @bind-Value="newAction.Social"/>
+    </div>
+    <div style=" color:white" class="form-group">
+        Time block cost:<br/>
+        <ValidationMessage For="@(() => newAction.TimeCost)"/>
+        <InputNumber rows="1" @bind-Value="newAction.TimeCost"/>
+    </div>
+    <p class="actions">
+        <Button Color="Color.Primary" Type="ButtonType.Submit">Create</Button>
+    </p>
+</EditForm>
+
+  @if (actionSaved)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Your action suggestion has been saved. Thanks a latte! </label>
+        </div>
+    }
+
+
+@code {
+    private string Username { get; set; }
+    private string Suggestion { get; set; }
+    private string SuggestionErrorMessage { get; set; }
+    private bool actionSaved;
+    private Action newAction;
+
+    protected override Task OnInitializedAsync() {
+        Username = ((Authenticator) AuthStat).GetCachedUser().Username;
+        newAction = new Action();
+        actionSaved = false;
+        return base.OnInitializedAsync();
+    }
+
+    private void SendSuggestion() {
+        if (Suggestion.IsNullOrEmpty()) {
+            SuggestionErrorMessage = "The suggestion needs to contain something, you know";
+        }
+        else {
+            suggestionService.SaveSuggestionAsync(Username, Suggestion);
+            SuggestionErrorMessage = "Your suggestion has been sent to the developers. Thanks a bunch and a tad!";
+            Suggestion = "";
+        }
+    }
+
+    private void SendAction() {
+        newAction.Creator = Username;
+        actionService.SaveActionAsync(newAction);
+        actionSaved = true;
+        newAction = new Action();
+    }
+}

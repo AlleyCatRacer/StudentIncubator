@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Client",
+    "\\Client\\StudentIncubator",
+    "\\Client\\StudentIncubator\\Authorization",
+    "\\Client\\StudentIncubator\\bin",
+    "\\Client\\StudentIncubator\\Data",
+    "\\Client\\StudentIncubator\\obj",
+    "\\Client\\StudentIncubator\\Properties",
+    "\\Client\\StudentIncubator\\Shared",
+    "\\Client\\StudentIncubator\\wwwroot"
+  ],
+  "SelectedNode": "\\Client\\StudentIncubator\\Pages\\Rules.razor",
+  "PreviewInSolutionExplorer": false
+}

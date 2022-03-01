@@ -1,0 +1,228 @@
+﻿@page "/Login"
+@using StudentIncubator.Authorization
+@using StudentIncubator.Models
+@using System.Security.Authentication
+@using StudentIncubator.Data.ServiceImp
+@using StudentIncubator.Data.ServiceInterface
+@namespace LoginComponent
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IUserService UserService
+@inject IAvatarService AvatarService
+@inject NavigationManager NavigationManager
+
+<style>body{background-color:#1F2833}</style>
+
+<AuthorizeView Context="loggedIn">
+    <NotAuthorized>
+        <div class="form-group">
+            <label>Username: </label> <input MaxLength="20" Width="Width.Is25" Placeholder="Username..." @bind-value="username"/>
+        </div>
+        <div class="form-group">
+            <label>Password: </label> <input MaxLength="20" Width="Width.Is25" type="password" Placeholder="Password..." @bind-value="password"/>
+        </div>
+        <div class="errorMessage">@errorMessage</div>
+        <Div Margin="Margin.Is5.FromLeft.Is3.FromTop" Class="form-group">
+            <Buttons>
+                <Button Color="Color.Primary" @onclick="PerformLoginAsync">Login</Button>
+                <Button Color="Color.Primary" @onclick="CreateAccountAsync">Create Account</Button>
+            </Buttons>
+        </Div>
+    </NotAuthorized>
+    <Authorized>
+        @if (LocalUser == null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <h3>
+                Welcome, @LocalUser.Username
+                <Button Color="Color.Primary" @onclick="PerformLogoutAsync">Logout</Button>
+            </h3>
+
+            <p class="infoMessage">@infoMessage</p>
+            <p>@Highscore()</p>
+            <EditForm Model="@LocalUser" OnValidSubmit="@UpdateUser">
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label>Bio:</label><br />
+                    <InputTextArea @bind-Value="LocalUser.Bio" maxlength="500" cols="150" rows="4" />
+                    <br />
+                </div>
+                <p class="actions">
+                    <Button Color="Color.Primary" @onclick="@UpdateUser">Save</Button>
+                </p>
+
+                <p class="errorMessage">
+                    <br />@errorMessage
+                </p>
+
+                <div class="form-group">
+                    <label>Input your current password:</label><br />
+                    <input MaxLength="20" Width="Width.Is25" type="password" @bind-value="currentPassword" />
+                </div>
+                <div class="form-group">
+                    <label>Input a new password:</label><br />
+                    <input MaxLength="20" Width="Width.Is25" type="password" @bind-value="newPassword" />
+                </div>
+                <div class="form-group">
+                    <label>Confirm new password:</label><br />
+                    <input MaxLength="20" Width="Width.Is25" type="password" @bind-value="confirmPassword" />
+                    <br />
+                </div>
+                <p class="actions">
+                    <Button Color="Color.Primary" @onclick="ChangePasswordAsync">Update password</Button>
+                </p>
+            </EditForm>
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    private string username;
+    private string password;
+    private string infoMessage = "";
+    private string errorMessage = "";
+    private User newUser;
+    private User LocalUser { get; set; }
+    private string currentPassword;
+    private string newPassword;
+    private string confirmPassword;
+
+    protected override Task OnInitializedAsync()
+    {
+        username = "";
+        password = "";
+        errorMessage = "";
+        infoMessage = "";
+
+        try
+        {
+            LocalUser = UserService.CachedUser;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return base.OnInitializedAsync();
+    }
+
+    private async Task PerformLoginAsync()
+    {
+        try
+        {
+            await ((Authenticator) AuthenticationStateProvider).ValidateLoginAsync(username, password);
+            username = "";
+            password = "";
+            NavigationManager.NavigateTo($"/");
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+    }
+
+    private async Task PerformLogoutAsync()
+    {
+        errorMessage = "";
+        username = "";
+        password = "";
+        try
+        {
+            await ((Authenticator) AuthenticationStateProvider).LogoutAsync();
+            LocalUser.Online = false;
+            await UserService.UpdateUserAsync(LocalUser);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            //
+        }
+        LocalUser = null;
+    }
+
+    private async Task CreateAccountAsync()
+    {
+        try
+        {
+            CredentialCheck(username, password);
+            newUser = new User
+            {
+                Username = username,
+                Password = password,
+                Online = true
+            };
+            await ((UserWebService) UserService).CreateAccountAsync(newUser);
+            await PerformLoginAsync();
+        }
+        catch (Exception e)
+        {
+            errorMessage = "User with this username already exists";
+            username = "";
+            password = "";
+        }
+    }
+
+    private static void CredentialCheck(string checkUsername, string checkPassword)
+    {
+        if (checkUsername == null)
+        {
+            if (checkPassword.Length > 5) return;
+            throw new InvalidCredentialException("Password must be at least 6 characters.");
+        }
+        if (checkUsername.Length > 2 && checkPassword.Length > 5) return;
+        throw new InvalidCredentialException("Username must be at least 3 characters.\nPassword must be at least 6 characters.");
+    }
+
+    private async Task ChangePasswordAsync()
+    {
+        errorMessage = "";
+
+        try
+        {
+            var check = ((Authenticator) AuthenticationStateProvider).ValidateLoginAsync(LocalUser.Username, currentPassword);
+            CredentialCheck(null, newPassword);
+            ComparePasswords();
+            await check;
+            LocalUser.Password = newPassword;
+            UpdateUser();
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+
+        currentPassword = "";
+        newPassword = "";
+        confirmPassword = "";
+    }
+
+    private void ComparePasswords()
+    {
+        if (newPassword.Equals(confirmPassword)) return;
+
+        throw new InvalidCredentialException("Passwords do not match.");
+    }
+
+    private string Highscore()
+    {
+    return ("Highscore = " + UserService.CachedUser.Highscore);
+    }
+
+    private void UpdateUser()
+    {
+        try
+        {
+            UserService.UpdateUserAsync(LocalUser);
+            LocalUser = UserService.CachedUser;
+            infoMessage = "Your account has been updated.";
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+    }
+}

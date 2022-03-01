@@ -1,0 +1,122 @@
+@page "/Users/{Username}"
+@using StudentIncubator.Data.ServiceInterface
+@using StudentIncubator.Models
+
+@inject IUserService UserService
+@inject IAvatarService AvatarService
+@inject NavigationManager NavigationManager
+
+
+<style>body{background-color:#1F2833}</style>
+
+<h3>
+    @Username <Icon Name="IconName.DotCircle" Style="@Online"/>
+</h3>
+
+<p>@Highscore</p>
+
+@if (OtherUser != null)
+{
+    <h5>Bio</h5>
+    <div>
+        <textarea readonly="readonly"  >@OtherUser.Bio</textarea>
+        <br/>
+        <br/>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@if (OtherAvatar != null)
+{
+    <h5>Avatar</h5>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Health</th>
+            <th>Academics</th>
+            <th>Finances</th>
+            <th>Social</th>
+            <th>Time left</th>
+            @if (!OtherUser.HasHug && OtherUser.Username != UserService.CachedUser.Username)
+            {
+                <th>
+                    Give Hug
+                </th>
+            }
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>@OtherAvatar.AvatarName</td>
+            <td>@OtherAvatar.GetHealth()</td>
+            <td>@OtherAvatar.GetAcademic()</td>
+            <td>@OtherAvatar.GetFinancial()</td>
+            <td>@OtherAvatar.GetSocial()</td>
+            <td>@OtherAvatar.TimeBlock</td>
+            @if (!OtherUser.HasHug && OtherUser.Username != UserService.CachedUser.Username)
+            {
+                <td>
+
+                    <Button Color="Color.Primary" @onclick="InteractAsync">
+                        Hug
+                    </Button>
+                </td>
+            }
+        </tr>
+        </tbody>
+    </table>
+    <div class="infoMessage">
+        <br/>@infoMessage
+    </div>
+}
+else
+{
+    <p class="infoMessage">@infoMessage</p>
+}
+
+
+@code
+{
+    [Parameter]
+    public string Username { get; set; }
+
+    private User OtherUser { get; set; }
+    private Avatar OtherAvatar { get; set; }
+    private string infoMessage = "Loading...";
+    private string Highscore;
+    private string Online;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            OtherUser = await UserService.GetPublicUserAsync(Username);
+            Highscore = ("Highscore = " + OtherUser.Highscore);
+            Online = OtherUser.Online ? "color:chartreuse" : "color:lightgrey";
+            OtherAvatar = await AvatarService.GetAvatarAsync(Username);
+            if (OtherAvatar != null)
+            {
+                infoMessage = "";
+            }
+        }
+        catch (Exception e)
+        {
+            infoMessage = e.Message;
+            AvatarService.CachedAvatar = null;
+        }
+    }
+    
+    private async Task InteractAsync()
+    {
+        var huggedUser = new User {Username = Username, Password = "Hug", Bio = "", HasHug = true};
+        await UserService.UpdateUserAsync(huggedUser);
+        await OnInitializedAsync();
+        infoMessage = $"You have sent {Username} a hug! awww";
+    }
+}

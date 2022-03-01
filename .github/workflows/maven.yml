@@ -1,0 +1,44 @@
+name: DataServer - StudentIncubator Actions for Pushing to Main
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Step 1 - Checkout main branch from Repository
+      uses: actions/checkout@v2
+      
+    - name: Step 2 - Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+        cache: maven
+
+   # - name: Step 3 - Build with DB
+    #  run: psql --file /home/runner/work/StudentIncubator/StudentIncubator/DataServer/external/student_incubator.sql
+
+    - name: Step 3 - Build with Maven
+      run: mvn -B package --file /home/runner/work/StudentIncubator/StudentIncubator/DataServer/pom.xml
+

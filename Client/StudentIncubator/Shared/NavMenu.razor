@@ -1,0 +1,77 @@
+﻿@using StudentIncubator.Data.ServiceInterface
+@using Authorization
+@using StudentIncubator.Pages
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStat
+@inject IAvatarService AvatarService
+
+
+<Bar Mode="BarMode.VerticalInline"
+     CollapseMode="BarCollapseMode.Small"
+     Breakpoint="Breakpoint.Desktop"
+     NavigationBreakpoint="Breakpoint.Tablet"
+     Background="Background.Dark"
+     ThemeContrast="ThemeContrast.Light">
+    <BarBrand>
+        <BarItem>
+            <BarLink To="#">
+                <BarIcon IconName="IconName.School"/>
+                StudentIncubator
+            </BarLink>
+        </BarItem>
+    </BarBrand>
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <BarLink To="/">
+                    <BarIcon IconName="IconName.Home"/>
+                    Home
+                </BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/Login">
+                    <BarIcon IconName="IconName.UserCircle"/>
+                    Account
+                </BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="/Rules">
+                    <BarIcon IconName="IconName.FileAlt"/>
+                    Rules
+                </BarLink>
+            </BarItem>
+            <AuthorizeView>
+                <BarItem>
+                    <BarLink @onclick="@AvatarNav">
+                        <BarIcon IconName="IconName.List"/>
+                        Main Menu
+                    </BarLink>
+                </BarItem>
+                <BarItem>
+                    <BarLink To="/UserList">
+                        <BarIcon IconName="IconName.Cocktail"/>
+                        All users
+                    </BarLink>
+                </BarItem>
+                <BarItem>
+                    <BarLink To="/Feedback">
+                        <BarIcon IconName="IconName.Snowflake"/>
+                        Feedback
+                    </BarLink>
+                </BarItem>
+            </AuthorizeView>
+
+        </BarStart>
+    </BarMenu>
+</Bar>
+
+@code {
+
+    private string username => ((Authenticator) AuthStat).GetCachedUser().Username;
+
+    private void AvatarNav() {
+        NavigationManager.NavigateTo($"/Avatars/{username}");
+    }
+
+}

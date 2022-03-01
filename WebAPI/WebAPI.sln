@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncWebAPI", "IncWebAPI\IncWebAPI.csproj", "{64D10A2B-A28D-4E12-B556-B80F3CD79EFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestingWebAPI", "UnitTestingWebAPI\UnitTestingWebAPI.csproj", "{2E198383-9A24-461F-97E6-1C8E9FC3FA03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{64D10A2B-A28D-4E12-B556-B80F3CD79EFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64D10A2B-A28D-4E12-B556-B80F3CD79EFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64D10A2B-A28D-4E12-B556-B80F3CD79EFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64D10A2B-A28D-4E12-B556-B80F3CD79EFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E198383-9A24-461F-97E6-1C8E9FC3FA03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E198383-9A24-461F-97E6-1C8E9FC3FA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E198383-9A24-461F-97E6-1C8E9FC3FA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E198383-9A24-461F-97E6-1C8E9FC3FA03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

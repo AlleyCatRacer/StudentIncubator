@@ -1,0 +1,6 @@
+*.dll
+*.pdb
+*.cache
+*.razor.g.cs
+*.AssemblyInfo.cs
+*.editorConfig

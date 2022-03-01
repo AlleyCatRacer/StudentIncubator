@@ -1,0 +1,134 @@
+﻿@page "/Avatars/{Username}"
+@using StudentIncubator.Models
+@using StudentIncubator.Data.ServiceInterface
+@using Authorization
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAvatarService AvatarService
+@inject NavigationManager NavigationManager
+
+<style>body{background-color:#1F2833}</style>
+
+<h3>Main menu</h3>
+<p class="infoMessage">@errorMessage</p>
+
+@if (LocalAvatar == null)
+{
+    <p class="infoMessage">Loading...</p>
+}
+else if (AvatarService.CachedAvatar == null)
+{
+    <EditForm Model="@newAvatar" OnValidSubmit="@CreateAvatarAsync">
+        <DataAnnotationsValidator/>
+        <div style=" color:white" class="form-group">
+            Avatar name:<br/>
+            <InputTextArea rows="1" @bind-Value="newAvatar.AvatarName"/>
+        </div>
+        <p class="actions">
+            <Button Color="Color.Primary"  @onclick=CreateAvatarAsync>Create</Button>
+        </p>
+    </EditForm>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Health</th>
+            <th>Academics</th>
+            <th>Finances</th>
+            <th>Social</th>
+            <th>Time left</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>@AvatarService.CachedAvatar.AvatarName</td>
+            <td>@AvatarService.CachedAvatar.GetHealth()</td>
+            <td>@AvatarService.CachedAvatar.GetAcademic()</td>
+            <td>@AvatarService.CachedAvatar.GetFinancial()</td>
+            <td>@AvatarService.CachedAvatar.GetSocial()</td>
+            <td>@AvatarService.CachedAvatar.TimeBlock</td>
+            <td>
+                <button @onclick="@DeleteAvatarAsync">
+                    <i class="oi oi-trash" style="color:red"></i>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table> 
+    <Div>
+    <Button Color="Color.Primary" @onclick=Play>
+        <p>Play</p>
+    </Button>
+    </Div>
+}
+
+
+@code
+{
+    [Parameter]
+    public string Username { get; set; }
+
+    private Avatar LocalAvatar { get; set; }
+    private readonly Avatar newAvatar = new(null, null);
+    private string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Username = ((Authenticator) AuthenticationStateProvider).GetCachedUser().Username;
+        
+        AvatarService.CachedAvatar = null;
+        try
+        {
+            if (AvatarService.CachedAvatar == null)
+            {
+                LocalAvatar = await AvatarService.GetAvatarAsync(Username);
+            }
+            else
+            {
+                LocalAvatar = AvatarService.CachedAvatar;
+            }
+        }
+        catch (Exception e)
+        {
+            LocalAvatar = newAvatar;
+            errorMessage = e.Message;
+        }
+    }
+
+    private async Task CreateAvatarAsync()
+    {
+        try
+        {
+            LocalAvatar = await AvatarService.CreateAvatarAsync(Username, newAvatar.AvatarName);
+            NavigationManager.NavigateTo($"/Avatars/{Username}");
+            errorMessage = "";
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+        newAvatar.AvatarName = null;
+    }
+
+    private async Task DeleteAvatarAsync()
+    {
+        try
+        {
+            await AvatarService.DeleteAvatarAsync(Username);
+            NavigationManager.NavigateTo($"/Avatars/{Username}");
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+    }
+
+    private void Play()
+    {
+        NavigationManager.NavigateTo($"/Game/{Username}/{LocalAvatar.AvatarName}");
+    }
+}

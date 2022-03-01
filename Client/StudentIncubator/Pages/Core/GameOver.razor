@@ -1,0 +1,38 @@
+@page "/GameOver/{Username}/{Cod}"
+@using StudentIncubator.Data.ServiceInterface
+@using StudentIncubator.Authorization
+
+@inject IAvatarService AvatarService
+@inject AuthenticationStateProvider AuthStat
+@inject NavigationManager NavigationManager
+
+<style>body{background-color:#1F2833}</style>
+
+<h3 class="errorMessage">You have failed the semester</h3>
+
+<h4 class="errorMessage">@AvatarService.CachedAvatar.AvatarName's @Cod</h4>
+
+<div class="form-group">
+    <Button Color="Color.Danger" @onclick="FateAcceptedAsync">I accept my fate</Button>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Username { get; set; }
+
+    [Parameter]
+    public string Cod { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        Username = ((Authenticator) AuthStat).GetCachedUser().Username;
+        return base.OnInitializedAsync();
+    }
+
+    private void FateAcceptedAsync()
+    {
+        AvatarService.DeleteAvatarAsync(Username);
+        NavigationManager.NavigateTo("/");
+    }
+}

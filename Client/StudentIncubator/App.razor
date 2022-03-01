@@ -1,0 +1,26 @@
+﻿<Blazorise.ThemeProvider Theme="@theme">
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+    </Found>
+    <NotFound>
+        <CascadingAuthenticationState>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p style=" color:white">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </CascadingAuthenticationState>
+    </NotFound>
+</Router>
+</Blazorise.ThemeProvider>
+
+@code{
+    private Theme theme = new Theme
+    {
+     BackgroundOptions = new ThemeBackgroundOptions
+        {
+            Dark="#c5c6c7",
+            
+        }
+        
+    };
+}

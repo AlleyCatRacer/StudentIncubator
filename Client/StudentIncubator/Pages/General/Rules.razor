@@ -1,0 +1,85 @@
+﻿@page "/Rules"
+
+<style>body{background-color:#1F2833}</style>
+
+<h3 class="text-center">Rules</h3>
+<div>
+    <p class="text-center">
+        When you create your avatar, you start off as a new student in a semester.
+        Ultimately, your goal is to brave all the challenges and complete the semester.
+    </p>
+
+    <p>You have four aspects that constitute your well-being:</p>
+</div>
+<Table Striped="true">
+    <TableHeader>
+        <TableRow>
+            <TableHeaderCell></TableHeaderCell>
+            <TableHeaderCell>Category</TableHeaderCell>
+            <TableHeaderCell>Description</TableHeaderCell>
+           
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        <TableRow>
+            <TableRowHeader><Icon Name="IconName.ClinicMedical" /></TableRowHeader>
+            <TableRowCell>Health</TableRowCell>
+            <TableRowCell>Your mental and physical health</TableRowCell>
+           
+        </TableRow>
+        <TableRow>
+            <TableRowHeader><Icon Name="IconName.MoneyBillAlt" /></TableRowHeader>
+            <TableRowCell>Finances</TableRowCell>
+            <TableRowCell>How well you are doing in terms of money</TableRowCell>
+        </TableRow>
+        <TableRow>
+            <TableRowHeader><Icon Name="IconName.Book" /></TableRowHeader>
+            <TableRowCell>Academics</TableRowCell>
+            <TableRowCell>Your academic performance</TableRowCell>
+           
+        </TableRow>
+        <TableRow>
+            <TableRowHeader><Icon Name="IconName.Users" /></TableRowHeader>
+            <TableRowCell>Social</TableRowCell>
+            <TableRowCell>How well you maintain and expand your social network</TableRowCell>
+           
+        </TableRow>
+    </TableBody>
+</Table>
+
+<div>
+    <p>
+       In the current state the semester consists of 80 time blocks.
+    </p>
+    
+    
+</div>
+<h5 class="text-center">
+        Time is your resource.
+    </h5>
+
+<Div > 
+    <p class="text-justify">
+        TBs are used on actions that will affect one or more of your well-being aspects.
+        Disjointly from actions, random events will occur with varying effects to your well-being.
+    </p>
+    <p class="text-justify">
+        As you create the avatar, all aspects will be set to 100 (their maximum value).
+    </p>
+    <p class="text-justify">
+        If at any point during the semester one of the meters reaches 0 - you lose.
+        Don’t worry, you can try again. University is a finicky construct
+        and there is no shame in braving the abyss through hard work.
+    </p>
+    <p class="text-justify">
+        If the semester ends and you manage to maintain all four aspects - you win.
+        You are ready to face your nightmares. But nothing precludes you from doing it again to
+        better harness the whirlpool of University.
+    </p>
+</Div>
+
+<h5 class="text-center">Good luck and shall perseverance rule over frustration!</h5>
+
+@code {
+
+}

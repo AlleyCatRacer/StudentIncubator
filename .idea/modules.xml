@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/DataServer/DataServer.iml" filepath="$PROJECT_DIR$/DataServer/DataServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LogicServer/LogicServer.iml" filepath="$PROJECT_DIR$/LogicServer/LogicServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/StudentIncubator.iml" filepath="$PROJECT_DIR$/.idea/StudentIncubator.iml" />
+    </modules>
+  </component>
+</project>

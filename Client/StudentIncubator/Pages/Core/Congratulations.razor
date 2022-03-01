@@ -1,0 +1,59 @@
+@page "/Congratulations/{Username}/{AvatarName}"
+@using StudentIncubator.Data.ServiceInterface
+@using StudentIncubator.Models
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAvatarService AvatarService
+@inject IUserService UserService
+
+<style>body{background-color:#1F2833}</style>
+
+<h3>Congratulations!</h3>
+
+<p>@ActiveAvatar.AvatarName has passed the semester!</p>
+<p>@Score()</p>
+<div class="form-group">
+    <Button Color="Color.Success" @onclick="YayAsync">Yay!</Button>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Username { get; set; }
+
+    [Parameter]
+    public string AvatarName { get; set; }
+
+    private Avatar ActiveAvatar { get; set; }
+
+    private User Temp { get; set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+        ActiveAvatar ??= AvatarService.CachedAvatar;
+        ActiveAvatar = await AvatarService.GetAvatarAsync(Username);
+        AvatarName = ActiveAvatar.AvatarName;
+    }
+
+    private string Score()
+    {
+        int score = ActiveAvatar.GetAcademic() + ActiveAvatar.GetFinancial() + ActiveAvatar.GetSocial() + ActiveAvatar.GetHealth();
+        return ("score = " + score);
+    }
+
+    private void YayAsync()
+    {
+
+        int score = ActiveAvatar.GetAcademic() + ActiveAvatar.GetFinancial() + ActiveAvatar.GetSocial() + ActiveAvatar.GetHealth();
+        if (score > UserService.CachedUser.Highscore)
+        {
+            Temp = UserService.CachedUser;
+            Temp.Highscore = score;
+            Temp.Password = null;
+            UserService.UpdateUserAsync(Temp);
+        }
+        AvatarService.DeleteAvatarAsync(Username);
+        NavigationManager.NavigateTo("/");
+    }
+}

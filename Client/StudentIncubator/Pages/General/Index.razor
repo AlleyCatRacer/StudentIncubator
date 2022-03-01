@@ -1,0 +1,44 @@
+@page "/"
+@using Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<style>body{background-color:#1F2833}</style>
+
+<h1>Welcome to The Student Incubator</h1>
+<AuthorizeView>
+    <NotAuthorized>
+        <h2>Please <a id="linked" @onclick="@GoToLogin">login</a> to play</h2>
+    </NotAuthorized>
+    <Authorized>
+        <Button Color="Color.Primary" @onclick="StartGame">Start game</Button>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthStat { get; set; }
+
+    private string username => ((Authenticator)AuthenticationStateProvider).GetCachedUser().Username;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var user = (await AuthStat).User;
+        if (!user.Identity.IsAuthenticated)
+        {
+            GoToLogin();
+        }
+    }
+    
+    private void StartGame()
+    {
+        NavigationManager.NavigateTo($"/Avatars/{username}");
+    }
+
+    private void GoToLogin()
+    {
+        NavigationManager.NavigateTo("/Login");
+    }
+}

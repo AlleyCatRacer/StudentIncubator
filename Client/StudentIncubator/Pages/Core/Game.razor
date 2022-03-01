@@ -1,0 +1,110 @@
+﻿@page "/Game/{Username}/{AvatarName}"
+
+@using Authorization
+@using StudentIncubator.Data.ServiceInterface
+@using StudentIncubator.Models
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAvatarService AvatarService
+@inject IUserService UserService
+
+<style>body{background-color:#1F2833}</style>
+
+<h3>@AvatarName's first semester</h3>
+
+<h4 class="infoMessage">@notificationMessage</h4>
+<div class="form-group">
+    <p style=" color:white">Health points: @ActiveAvatar.GetHealth()</p>
+    <p style=" color:white">Academic points: @ActiveAvatar.GetAcademic()</p>
+    <p style=" color:white">Financial points: @ActiveAvatar.GetFinancial()</p>
+    <p style=" color:white">Social points: @ActiveAvatar.GetSocial()</p>
+    <p style=" color:white">Time left: @ActiveAvatar.TimeBlock</p>
+</div>
+<div class="form-group">
+    <Buttons>
+        <Tooltip Text="Health++, Academic-, Social-"  Placement="TooltipPlacement.Bottom">
+            <Button Color="Color.Secondary" @onclick="@(() => PerformActionAsync("Sleep"))">Sleep</Button>
+        </Tooltip>
+        <Tooltip Text="Health--, Academic-, Financial++,"  Placement="TooltipPlacement.Bottom">
+            <Button Color="Color.Secondary" @onclick="@(() => PerformActionAsync("Work"))">Work</Button>
+        </Tooltip>
+        <Tooltip Text="Health--, Academic++, Social-"  Placement="TooltipPlacement.Bottom">
+            <Button Color="Color.Secondary" @onclick="@(() => PerformActionAsync("StudyAlone"))">Study</Button>
+        </Tooltip>
+        <Tooltip Text="Health--, Academic+, Social+"  Placement="TooltipPlacement.Bottom">
+            <Button Color="Color.Secondary" @onclick="@(() => PerformActionAsync("StudyInGroup"))">Group study</Button>
+        </Tooltip>
+        <Tooltip Text="Health-, Academics--, Financial---, Social++"  Placement="TooltipPlacement.Bottom">
+            <Button Color="Color.Secondary" @onclick="@(() => PerformActionAsync("Party"))">Party</Button>
+        </Tooltip>
+    </Buttons>
+</div>
+
+<div>
+    <Button Color="Color.Primary" @onclick="SaveGame">Save and quit</Button>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Username { get; set; }
+
+    [Parameter]
+    public string AvatarName { get; set; }
+   
+    private Avatar ActiveAvatar { get; set; }
+    private string notificationMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Username = ((Authenticator) AuthenticationStateProvider).GetCachedUser().Username;
+        ActiveAvatar ??= AvatarService.CachedAvatar;
+        ActiveAvatar = await AvatarService.GetAvatarAsync(Username);
+        AvatarName = ActiveAvatar.AvatarName;
+
+        if (((Authenticator) AuthenticationStateProvider).GetCachedUser().HasHug)
+        {
+            await PerformActionAsync("Hug");
+            await UserService.UpdateUserAsync(new User{Username = Username, Password = "Hug", Bio = "", HasHug = false});
+            ((Authenticator) AuthenticationStateProvider).GetCachedUser().HasHug = false;
+            notificationMessage = "You have received a hug ;)";
+        }
+    }
+
+    private void GameOver(string cod)
+    {
+        NavigationManager.NavigateTo($"/GameOver/{Username}/{cod}");
+    }
+
+    private void Congratulations()
+    {
+        NavigationManager.NavigateTo($"/Congratulations/{Username}/{AvatarName}");
+    }
+
+    private void SaveGame()
+    {
+        NavigationManager.NavigateTo($"/Avatars/{Username}");
+    }
+
+    private async Task PerformActionAsync(string actionType)
+    {
+        try {
+            notificationMessage = "";
+            ActiveAvatar = await AvatarService.UpdateAvatarAsync(ActiveAvatar, actionType);
+            if (ActiveAvatar.EventDescription != null)
+            {
+                notificationMessage = ActiveAvatar.EventDescription;
+            }
+        }
+        catch (Exception e)
+        {
+            if (e.Message.Contains("human"))
+            {
+                Congratulations();
+            }
+            else
+                GameOver(e.Message);
+        }
+    }
+}
