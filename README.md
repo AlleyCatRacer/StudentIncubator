@@ -1,6 +1,7 @@
 # SEP_A21
-Written as a 3rd semester project for software engineering at VIA university college, campus Horsens, DK.
-Autumn semester 2021: The requirements were to create a heterogeneous system that utilizes at least two different communication technologies and includes server-to-server communication.
+Written as a 3rd semester project in autumn of 2021 for software engineering at VIA university college, campus Horsens, DK.
+
+The requirements were to create a heterogeneous system that utilizes at least two different communication technologies and includes server-to-server communication.
 
 The project idea is a website based game with minimal graphics. The goal of the game is to create an avatar which is a college student and keeping it alive throughout a semester.
 
