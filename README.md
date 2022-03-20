@@ -1,5 +1,5 @@
 # Student Incubator
-Written as a 3<sup>rd</sup> semester project in autumn of 2021 for software engineering at VIA university college[^via], campus Horsens, DK.  
+Written as a 3<sup>rd</sup> semester project in autumn of 2021 for software engineering at [VIA university college](https://via.dk), campus Horsens, DK.  
 The project idea is a website based game with minimal graphics. The goal of the game is to create an avatar which is a college student and keeping it alive throughout a semester.
 
 ## The Game
@@ -25,19 +25,16 @@ The project was developed using the iterative Agile approach. We had freedom to 
 ## Development Team
 The semester project group consisted of 4 people:
 
-- Aldís Eir Hansen, AKA Allie [^0]
-- Lili Zsuzsanna Tóth, AKA Lil [^1]
-- Lukas Reimantas Tiuninas, AKA Rei [^2]
-- Joseph Carroll, AKA Jody [^3]
+- [Aldís Eir Hansen](https://github.com/AlleyCatRacer) [^0]
+- [Lili Zsuzsanna Tóth](https://github.com/tothlilizs) [^1]
+- [Lukas Reimantas Tiuninas](https://github.com/SkyKalazar) [^2]
+- [Joseph Carroll](https://github.com/carrolljody) [^3]
 
 ### Author Reference
-Base code DatabaseHelper.java and DataMapper.java courtesy of Ole Ildsgaard Hougaard [^4].  
-Base code for Authenticator.cs courtesy of Troels Mortensen [^5].
+Base code DatabaseHelper.java and DataMapper.java courtesy of [Ole Ildsgaard Hougaard](https://github.com/olehougaard).  
+Base code for Authenticator.cs courtesy of [Troels Mortensen](https://github.com/TroelsMortensen).
 
-[^via]: https://via.dk
-[^0]: https://github.com/AlleyCatRacer
-[^1]: https://github.com/tothlilizs
-[^2]: https://github.com/SkyKalazar
-[^3]: https://github.com/carrolljody
-[^4]: https://github.com/olehougaard
-[^5]: https://github.com/TroelsMortensen
+[^0]: AKA Allie, AlleyCatRacer
+[^1]: AKA Lil, tothlilizs
+[^2]: AKA Rei, SkyKalazar
+[^3]: AKA Jody, carrolljody
